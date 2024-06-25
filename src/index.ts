@@ -6,6 +6,15 @@ import userRoutes from "./routes/userRoute";
 
 const app = express();
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId: string;
+      auth0Id: string;
+    }
+  }
+}
+
 mongoose
   .connect(process.env.MONGODB_CONNECTION_URI as string)
   .then(() => console.log("Database connected"))
