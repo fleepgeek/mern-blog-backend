@@ -15,7 +15,6 @@ const jwtValidate = async (req: Request, res: Response, next: NextFunction) => {
       !req.headers.authorization ||
       !req.headers.authorization.startsWith("Bearer ")
     ) {
-      console.log("No header");
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -26,7 +25,6 @@ const jwtValidate = async (req: Request, res: Response, next: NextFunction) => {
     const user = await User.findOne({ auth0Id });
 
     if (!user) {
-      console.log("No user");
       return res.status(401).json({ message: "Unauthorized" });
     }
 

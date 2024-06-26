@@ -4,8 +4,6 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import userRoutes from "./routes/userRoute";
 
-const app = express();
-
 declare global {
   namespace Express {
     interface Request {
@@ -14,6 +12,8 @@ declare global {
     }
   }
 }
+
+const app = express();
 
 mongoose
   .connect(process.env.MONGODB_CONNECTION_URI as string)
