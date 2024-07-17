@@ -40,19 +40,24 @@ const getCurrentUser = async (req: Request, res: Response) => {
 };
 
 const updateCurrentUser = async (req: Request, res: Response) => {
-  const { userId } = req;
-  const { name, bio } = req.body;
-  const user = await User.findById(userId);
+  try {
+    const { userId } = req;
+    const { name, bio } = req.body;
+    const user = await User.findById(userId);
 
-  if (!user) {
-    return res.sendStatus(404);
+    if (!user) {
+      return res.sendStatus(404);
+    }
+
+    user.name = name;
+    user.bio = bio;
+
+    await user.save();
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed updating user!" });
   }
-
-  user.name = name;
-  user.bio = bio;
-
-  await user.save();
-  res.sendStatus(200);
 };
 
 export default { createCurrentUser, updateCurrentUser, getCurrentUser };
