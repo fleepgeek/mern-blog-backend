@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { v2 as cloudinary } from "cloudinary";
 import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
+import uploadImage from "../utils/uploadImage";
 
 const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -44,13 +44,37 @@ const createArticle = async (req: Request, res: Response) => {
   }
 };
 
-const uploadImage = async (file: Express.Multer.File) => {
-  const image = file;
-  const base64Image = image.buffer.toString("base64");
-  const imageDataURI = `data:${image.mimetype};base64,${base64Image}`;
-
-  const response = await cloudinary.uploader.upload(imageDataURI);
-  return response.url;
+const getArticles = async (req: Request, res: Response) => {
+  try {
+    const articles = await Article.find({}).populate("author", "name");
+    res.status(200).json(articles);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to get articles" });
+  }
 };
 
-export default { createArticle, getAllCategories, uploadCoverImage };
+const getSingleArticle = async (req: Request, res: Response) => {
+  try {
+    const article = await Article.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    await article.populate("author", "name");
+    await article.populate("category");
+
+    res.status(200).json(article);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to get article" });
+  }
+};
+
+export default {
+  createArticle,
+  getAllCategories,
+  uploadCoverImage,
+  getArticles,
+  getSingleArticle,
+};

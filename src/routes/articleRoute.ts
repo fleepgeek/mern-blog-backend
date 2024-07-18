@@ -7,7 +7,6 @@ import multer from "multer";
 const router = Router();
 
 router.post("/", jwtCheck, jwtValidate, articleController.createArticle);
-
 router.post(
   "/upload-image",
   upload.single("imageFile"),
@@ -17,5 +16,7 @@ router.post(
 );
 
 router.get("/categories", articleController.getAllCategories);
+router.get("/", articleController.getArticles);
+router.get("/:id", articleController.getSingleArticle);
 
 export default router;

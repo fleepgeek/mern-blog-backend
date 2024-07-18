@@ -37,7 +37,7 @@ app.use(cors());
 // });
 
 app.use("/api/my/user", userRoutes);
-app.use("/api/article", articleRoutes);
+app.use("/api/articles", articleRoutes);
 
 // Call only once to seed categories with some data
 // seedCategories();
