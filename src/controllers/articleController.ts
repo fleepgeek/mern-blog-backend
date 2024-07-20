@@ -54,6 +54,19 @@ const getArticles = async (req: Request, res: Response) => {
   }
 };
 
+const getUserArticles = async (req: Request, res: Response) => {
+  try {
+    const articles = await Article.find({ author: req.params.id }).populate(
+      "author",
+      "name"
+    );
+    res.status(200).json(articles);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to get user articles" });
+  }
+};
+
 const getSingleArticle = async (req: Request, res: Response) => {
   try {
     const article = await Article.findById(req.params.id);
@@ -71,10 +84,40 @@ const getSingleArticle = async (req: Request, res: Response) => {
   }
 };
 
+const updateArticle = async (req: Request, res: Response) => {
+  try {
+    const { title, category, content, coverImageUrl } = req.body;
+    const article = await Article.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    if (req.userId !== article.author._id.toString()) {
+      return res.status(403).json({
+        message: "You're only allowed to update articles created by you.",
+      });
+    }
+
+    article.title = title;
+    article.category = category;
+    article.content = content;
+    article.coverImageUrl = coverImageUrl;
+
+    const updatedArticle = await article.save();
+
+    res.status(200).send(updatedArticle);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to update article" });
+  }
+};
+
 export default {
   createArticle,
   getAllCategories,
   uploadCoverImage,
   getArticles,
+  getUserArticles,
   getSingleArticle,
+  updateArticle,
 };
