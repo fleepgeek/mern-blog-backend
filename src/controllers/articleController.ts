@@ -50,7 +50,8 @@ const getArticles = async (req: Request, res: Response) => {
 
     const pageSize = 5;
     const skip = pageSize * page - pageSize;
-    const articles = await Article.find({})
+    // const articles = await Article.find({})
+    const articles = await Article.find()
       .populate("author", "name")
       .limit(pageSize)
       .skip(skip)
@@ -70,6 +71,53 @@ const getArticles = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get articles" });
+  }
+};
+
+const getArticlesByCategory = async (req: Request, res: Response) => {
+  try {
+    const categoryId = req.params.id;
+    const total = await Article.countDocuments({
+      category: categoryId,
+    });
+    if (!total) {
+      return res.status(404).json({
+        pagingInfo: {
+          total: 0,
+          page: 1,
+          pages: 1,
+        },
+        articles: [],
+      });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+
+    const pageSize = 5;
+    const skip = pageSize * page - pageSize;
+    // const articles = await Article.find({})
+    const articles = await Article.find({
+      category: categoryId,
+    })
+      .populate("author", "name")
+      .limit(pageSize)
+      .skip(skip)
+      .lean();
+
+    // const total = await Article.countDocuments();
+    const pages = Math.ceil(total / pageSize);
+    const response = {
+      pagingInfo: {
+        total,
+        page,
+        pages,
+      },
+      articles,
+    };
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to get articles in the category" });
   }
 };
 
@@ -152,6 +200,7 @@ export default {
   getAllCategories,
   uploadCoverImage,
   getArticles,
+  getArticlesByCategory,
   getUserArticles,
   getSingleArticle,
   updateArticle,

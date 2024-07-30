@@ -23,6 +23,7 @@ router.post(
 
 router.get("/categories", articleController.getAllCategories);
 router.get("/", articleController.getArticles);
+router.get("/category/:id", articleController.getArticlesByCategory);
 router.get("/user/:id", articleController.getUserArticles);
 router.get("/:id", articleController.getSingleArticle);
 
