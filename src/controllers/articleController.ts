@@ -46,8 +46,27 @@ const createArticle = async (req: Request, res: Response) => {
 
 const getArticles = async (req: Request, res: Response) => {
   try {
-    const articles = await Article.find({}).populate("author", "name");
-    res.status(200).json(articles);
+    const page = parseInt(req.query.page as string) || 1;
+
+    const pageSize = 5;
+    const skip = pageSize * page - pageSize;
+    const articles = await Article.find({})
+      .populate("author", "name")
+      .limit(pageSize)
+      .skip(skip)
+      .lean();
+
+    const total = await Article.countDocuments();
+    const pages = Math.ceil(total / pageSize);
+    const response = {
+      pagingInfo: {
+        total,
+        page,
+        pages,
+      },
+      articles,
+    };
+    res.status(200).json(response);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get articles" });
@@ -56,11 +75,27 @@ const getArticles = async (req: Request, res: Response) => {
 
 const getUserArticles = async (req: Request, res: Response) => {
   try {
-    const articles = await Article.find({ author: req.params.id }).populate(
-      "author",
-      "name"
-    );
-    res.status(200).json(articles);
+    const page = parseInt(req.query.page as string) || 1;
+
+    const pageSize = 5;
+    const skip = pageSize * page - pageSize;
+    const articles = await Article.find({ author: req.params.id })
+      .populate("author", "name")
+      .limit(pageSize)
+      .skip(skip)
+      .lean();
+
+    const total = await Article.countDocuments({ author: req.params.id });
+
+    const response = {
+      pagingInfo: {
+        total,
+        page,
+        pages: Math.ceil(total / pageSize) || 1,
+      },
+      articles,
+    };
+    res.status(200).json(response);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get user articles" });
