@@ -195,6 +195,24 @@ const updateArticle = async (req: Request, res: Response) => {
   }
 };
 
+const deleteArticle = async (req: Request, res: Response) => {
+  const article = await Article.findById(req.params.id);
+
+  if (!article) {
+    return res.status(404).json({ message: "Article not found!" });
+  }
+
+  if (req.userId !== article.author.toString()) {
+    return res.status(403).json({
+      message: "You're only allowed to delete articles created by you.",
+    });
+  }
+
+  await article.deleteOne();
+
+  res.status(200).json({ message: "Article succesfully deleted" });
+};
+
 export default {
   createArticle,
   getAllCategories,
@@ -204,4 +222,5 @@ export default {
   getUserArticles,
   getSingleArticle,
   updateArticle,
+  deleteArticle,
 };

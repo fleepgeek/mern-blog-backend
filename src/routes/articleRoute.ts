@@ -35,4 +35,6 @@ router.put(
   articleController.updateArticle
 );
 
+router.delete("/:id", jwtCheck, jwtValidate, articleController.deleteArticle);
+
 export default router;
