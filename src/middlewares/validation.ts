@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { body, check, checkSchema, validationResult } from "express-validator";
+import {
+  body,
+  check,
+  checkSchema,
+  query,
+  validationResult,
+} from "express-validator";
 
 const handleValidationErrors = async (
   req: Request,
@@ -42,5 +48,14 @@ export const validateArticleRequest = [
     .isString()
     .notEmpty()
     .withMessage("Content field is required"),
+  handleValidationErrors,
+];
+
+export const validateArticleSearchRequest = [
+  query("searchQuery")
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage("Provide a search query"),
   handleValidationErrors,
 ];

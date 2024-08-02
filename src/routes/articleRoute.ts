@@ -2,7 +2,10 @@ import { Router } from "express";
 import { jwtCheck, jwtValidate } from "../middlewares/auth";
 import articleController from "../controllers/articleController";
 import { upload } from "../middlewares/upload";
-import { validateArticleRequest } from "../middlewares/validation";
+import {
+  validateArticleRequest,
+  validateArticleSearchRequest,
+} from "../middlewares/validation";
 
 const router = Router();
 
@@ -23,6 +26,11 @@ router.post(
 
 router.get("/categories", articleController.getAllCategories);
 router.get("/", articleController.getArticles);
+router.get(
+  "/search",
+  validateArticleSearchRequest,
+  articleController.searchArticles
+);
 router.get("/category/:id", articleController.getArticlesByCategory);
 router.get("/user/:id", articleController.getUserArticles);
 router.get("/:id", articleController.getSingleArticle);

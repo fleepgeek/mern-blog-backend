@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
 import uploadImage from "../utils/uploadImage";
+import { title } from "process";
 
 const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -213,6 +214,53 @@ const deleteArticle = async (req: Request, res: Response) => {
   res.status(200).json({ message: "Article succesfully deleted" });
 };
 
+const searchArticles = async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const searchQuery = (req.query.searchQuery as string) || "";
+    const query: any = {};
+
+    const searchRegex = new RegExp(searchQuery, "i");
+    query["$or"] = [{ title: searchRegex }, { content: searchRegex }];
+
+    const total = await Article.countDocuments(query);
+
+    if (!total) {
+      return res.status(404).json({
+        pagingInfo: {
+          total: 0,
+          page: 1,
+          pages: 1,
+        },
+        articles: [],
+      });
+    }
+
+    const pageSize = 5;
+    const skip = pageSize * page - pageSize;
+
+    const articles = await Article.find(query)
+      .populate("author", "name")
+      .limit(pageSize)
+      .skip(skip)
+      .lean();
+
+    const pages = Math.ceil(total / pageSize);
+    const response = {
+      pagingInfo: {
+        total,
+        page,
+        pages,
+      },
+      articles,
+    };
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to search articles" });
+  }
+};
+
 export default {
   createArticle,
   getAllCategories,
@@ -223,4 +271,5 @@ export default {
   getSingleArticle,
   updateArticle,
   deleteArticle,
+  searchArticles,
 };
