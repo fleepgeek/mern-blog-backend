@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 import userRoutes from "./routes/userRoute";
 import articleRoutes from "./routes/articleRoute";
+import commentRoute from "./routes/commentRoute";
 // import { seedCategories } from "./scripts/seeds";
 
 declare global {
@@ -38,6 +39,7 @@ app.use(cors());
 
 app.use("/api/my/user", userRoutes);
 app.use("/api/articles", articleRoutes);
+// app.use("/api/comments", commentRoute); // moved to article cos its a subroute
 
 // Call only once to seed categories with some data
 // seedCategories();

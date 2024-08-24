@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { jwtCheck, jwtValidate } from "../middlewares/auth";
-import articleController from "../controllers/articleController";
+import ArticleController from "../controllers/ArticleController";
 import { upload } from "../middlewares/upload";
 import {
   validateArticleRequest,
@@ -14,35 +14,39 @@ router.post(
   jwtCheck,
   jwtValidate,
   validateArticleRequest,
-  articleController.createArticle
+  ArticleController.createArticle
 );
 router.post(
   "/upload-image",
   upload.single("imageFile"),
   jwtCheck,
   jwtValidate,
-  articleController.uploadCoverImage
+  ArticleController.uploadCoverImage
 );
 
-router.get("/categories", articleController.getAllCategories);
-router.get("/", articleController.getArticles);
+router.get("/categories", ArticleController.getAllCategories);
+router.get("/", ArticleController.getArticles);
 router.get(
   "/search",
   validateArticleSearchRequest,
-  articleController.searchArticles
+  ArticleController.searchArticles
 );
-router.get("/category/:id", articleController.getArticlesByCategory);
-router.get("/user/:id", articleController.getUserArticles);
-router.get("/:id", articleController.getSingleArticle);
+router.get("/category/:id", ArticleController.getArticlesByCategory);
+router.get("/user/:id", ArticleController.getUserArticles);
+router.get("/:id", ArticleController.getSingleArticle);
 
 router.put(
   "/:id",
   jwtCheck,
   jwtValidate,
   validateArticleRequest,
-  articleController.updateArticle
+  ArticleController.updateArticle
 );
 
-router.delete("/:id", jwtCheck, jwtValidate, articleController.deleteArticle);
+router.delete("/:id", jwtCheck, jwtValidate, ArticleController.deleteArticle);
+
+// Re-route into comment router
+import commentRoutes from "./commentRoute";
+router.use("/:articleId/comments", commentRoutes);
 
 export default router;

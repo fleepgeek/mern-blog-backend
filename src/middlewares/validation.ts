@@ -59,3 +59,12 @@ export const validateArticleSearchRequest = [
     .withMessage("Provide a search query"),
   handleValidationErrors,
 ];
+
+export const validateCommentRequest = [
+  body("content")
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage("Content field is required"),
+  handleValidationErrors,
+];
