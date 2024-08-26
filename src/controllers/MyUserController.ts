@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { User } from "../models/user";
+import Article from "../models/article";
+import { ObjectId } from "mongodb";
 
 const createCurrentUser = async (req: Request, res: Response) => {
   try {
@@ -60,4 +62,85 @@ const updateCurrentUser = async (req: Request, res: Response) => {
   }
 };
 
-export default { createCurrentUser, updateCurrentUser, getCurrentUser };
+const addBookmark = async (req: Request, res: Response) => {
+  try {
+    const id = req.body.id as string;
+
+    const article = await Article.findById(id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.sendStatus(404);
+    }
+
+    user.bookmarkedIds = [...user.bookmarkedIds, new ObjectId(id)];
+
+    await user.save();
+
+    res.send();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error adding bookmark" });
+  }
+};
+
+const removeBookmark = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const article = await Article.findById(id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.sendStatus(404);
+    }
+
+    user.bookmarkedIds = user.bookmarkedIds.filter(
+      (bookmarkId) => bookmarkId.toString() !== id
+    );
+
+    console.log(user.bookmarkedIds);
+
+    await user.save();
+
+    res.send();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error adding bookmark" });
+  }
+};
+
+const getBookmarks = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userBookmarkedArticles = await Article.find({
+      _id: { $in: user.bookmarkedIds },
+    })
+      .populate("author")
+      .populate("category");
+
+    res.status(200).json(userBookmarkedArticles);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error getting bookmarks" });
+  }
+};
+
+export default {
+  createCurrentUser,
+  updateCurrentUser,
+  getCurrentUser,
+  addBookmark,
+  removeBookmark,
+  getBookmarks,
+};

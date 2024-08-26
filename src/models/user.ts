@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   name: String,
   bio: String,
+  bookmarkedIds: [{ type: mongoose.Schema.Types.ObjectId, required: true }],
 });
 
 export const User = mongoose.model("User", userSchema);
