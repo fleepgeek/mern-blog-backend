@@ -24,6 +24,13 @@ router.post(
   ArticleController.uploadCoverImage
 );
 
+router.get(
+  "/me",
+  jwtCheck,
+  jwtValidate,
+  ArticleController.getCurrentUserArticles
+);
+
 router.get("/categories", ArticleController.getAllCategories);
 router.get("/", ArticleController.getArticles);
 router.get(
@@ -32,7 +39,7 @@ router.get(
   ArticleController.searchArticles
 );
 router.get("/category/:id", ArticleController.getArticlesByCategory);
-router.get("/user/:id", ArticleController.getUserArticles);
+router.get("/user/:id", ArticleController.getArticlesByUser);
 router.get("/:id", ArticleController.getSingleArticle);
 
 router.put(

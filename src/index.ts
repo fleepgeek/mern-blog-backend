@@ -37,7 +37,7 @@ app.use(cors());
 //   res.json({ message: "Welcome" });
 // });
 
-app.use("/api/my/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/articles", articleRoutes);
 // app.use("/api/comments", commentRoute); // moved to article cos its a subroute
 

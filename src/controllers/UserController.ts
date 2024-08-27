@@ -105,8 +105,6 @@ const removeBookmark = async (req: Request, res: Response) => {
       (bookmarkId) => bookmarkId.toString() !== id
     );
 
-    console.log(user.bookmarkedIds);
-
     await user.save();
 
     res.send();
@@ -136,6 +134,22 @@ const getBookmarks = async (req: Request, res: Response) => {
   }
 };
 
+const getUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-auth0Id -bookmarkedIds");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error getting user" });
+  }
+};
+
 export default {
   createCurrentUser,
   updateCurrentUser,
@@ -143,4 +157,5 @@ export default {
   addBookmark,
   removeBookmark,
   getBookmarks,
+  getUser,
 };

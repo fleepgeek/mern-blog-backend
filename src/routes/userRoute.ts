@@ -1,30 +1,31 @@
 import { Router } from "express";
-import MyUserController from "../controllers/MyUserController";
+import UserController from "../controllers/UserController";
 import { jwtCheck, jwtValidate } from "../middlewares/auth";
 import { validateMyUserRequest } from "../middlewares/validation";
-import { body } from "express-validator";
 
 const router = Router();
 
-router.get("/", jwtCheck, jwtValidate, MyUserController.getCurrentUser);
+router.get("/me", jwtCheck, jwtValidate, UserController.getCurrentUser);
 
-router.post("/", jwtCheck, MyUserController.createCurrentUser);
+router.post("/me", jwtCheck, UserController.createCurrentUser);
 
 router.put(
-  "/",
+  "/me",
   jwtCheck,
   jwtValidate,
   validateMyUserRequest,
-  MyUserController.updateCurrentUser
+  UserController.updateCurrentUser
 );
 
-router.post("/bookmarks", jwtCheck, jwtValidate, MyUserController.addBookmark);
-router.get("/bookmarks", jwtCheck, jwtValidate, MyUserController.getBookmarks);
+router.post("/me/bookmarks", jwtCheck, jwtValidate, UserController.addBookmark);
+router.get("/me/bookmarks", jwtCheck, jwtValidate, UserController.getBookmarks);
 router.delete(
-  "/bookmarks/:id",
+  "/me/bookmarks/:id",
   jwtCheck,
   jwtValidate,
-  MyUserController.removeBookmark
+  UserController.removeBookmark
 );
+
+router.get("/:id", UserController.getUser);
 
 export default router;
