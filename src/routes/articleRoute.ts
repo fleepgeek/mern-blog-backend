@@ -11,17 +11,11 @@ const router = Router();
 
 router.post(
   "/",
+  upload.single("imageFile"),
   jwtCheck,
   jwtValidate,
   validateArticleRequest,
   ArticleController.createArticle
-);
-router.post(
-  "/upload-image",
-  upload.single("imageFile"),
-  jwtCheck,
-  jwtValidate,
-  ArticleController.uploadCoverImage
 );
 
 router.get(
@@ -44,6 +38,7 @@ router.get("/:id", ArticleController.getSingleArticle);
 
 router.put(
   "/:id",
+  upload.single("imageFile"),
   jwtCheck,
   jwtValidate,
   validateArticleRequest,

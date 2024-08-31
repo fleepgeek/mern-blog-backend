@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
-import uploadImage from "../utils/uploadImage";
+import { deleteImage, uploadImage } from "../utils/handleImage";
 import { title } from "process";
 
 const getAllCategories = async (req: Request, res: Response) => {
@@ -35,6 +35,11 @@ const createArticle = async (req: Request, res: Response) => {
   try {
     const article = new Article(req.body);
     article.author = new mongoose.Types.ObjectId(req.userId);
+
+    if (req.file) {
+      const imageUrl = await uploadImage(req.file);
+      article.coverImageUrl = imageUrl;
+    }
 
     await article.save();
 
@@ -235,7 +240,14 @@ const updateArticle = async (req: Request, res: Response) => {
     article.title = title;
     article.category = category;
     article.content = content;
-    article.coverImageUrl = coverImageUrl;
+
+    if (req.file) {
+      const imageUrl = await uploadImage(req.file);
+      if (article.coverImageUrl) {
+        await deleteImage(article.coverImageUrl);
+      }
+      article.coverImageUrl = imageUrl;
+    }
 
     const updatedArticle = await article.save();
 
@@ -259,7 +271,12 @@ const deleteArticle = async (req: Request, res: Response) => {
     });
   }
 
-  await article.deleteOne();
+  const imageToDelete = article.coverImageUrl;
+  const result = await article.deleteOne();
+
+  if (result.deletedCount === 1 && imageToDelete) {
+    await deleteImage(imageToDelete);
+  }
 
   res.status(200).json({ message: "Article succesfully deleted" });
 };
