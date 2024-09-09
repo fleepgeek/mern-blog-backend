@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 import userRoutes from "./routes/userRoute";
 import articleRoutes from "./routes/articleRoute";
-import commentRoute from "./routes/commentRoute";
+// import commentRoute from "./routes/commentRoute";
 // import { seedCategories } from "./scripts/seeds";
 
 declare global {

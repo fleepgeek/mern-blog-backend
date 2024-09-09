@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
 import { deleteImage, uploadImage } from "../utils/handleImage";
-import { title } from "process";
 
 const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -34,7 +33,8 @@ const uploadCoverImage = async (req: Request, res: Response) => {
 const createArticle = async (req: Request, res: Response) => {
   try {
     const article = new Article(req.body);
-    article.author = new mongoose.Types.ObjectId(req.userId);
+    article.author = mongoose.Types.ObjectId.createFromHexString(req.userId);
+    // article.author = new mongoose.Types.ObjectId(req.userId);
 
     if (req.file) {
       const imageUrl = await uploadImage(req.file);
