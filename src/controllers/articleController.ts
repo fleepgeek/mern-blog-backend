@@ -33,8 +33,7 @@ const uploadCoverImage = async (req: Request, res: Response) => {
 const createArticle = async (req: Request, res: Response) => {
   try {
     const article = new Article(req.body);
-    article.author = mongoose.Types.ObjectId.createFromHexString(req.userId);
-    // article.author = new mongoose.Types.ObjectId(req.userId);
+    article.author = new mongoose.Types.ObjectId(req.userId);
 
     if (req.file) {
       const imageUrl = await uploadImage(req.file);
