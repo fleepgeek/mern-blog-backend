@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
 import { deleteImage, uploadImage } from "../utils/handleImage";
+import Comment from "../models/comment";
 
 const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -258,7 +259,8 @@ const updateArticle = async (req: Request, res: Response) => {
 };
 
 const deleteArticle = async (req: Request, res: Response) => {
-  const article = await Article.findById(req.params.id);
+  const { id } = req.params;
+  const article = await Article.findById(id);
 
   if (!article) {
     return res.status(404).json({ message: "Article not found!" });
@@ -273,8 +275,12 @@ const deleteArticle = async (req: Request, res: Response) => {
   const imageToDelete = article.coverImageUrl;
   const result = await article.deleteOne();
 
-  if (result.deletedCount === 1 && imageToDelete) {
-    await deleteImage(imageToDelete);
+  if (result.deletedCount === 1) {
+    if (imageToDelete) {
+      await deleteImage(imageToDelete);
+    }
+
+    await Comment.deleteMany({ article: id });
   }
 
   res.status(200).json({ message: "Article succesfully deleted" });
