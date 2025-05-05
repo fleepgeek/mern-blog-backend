@@ -44,6 +44,6 @@ app.use("/api/articles", articleRoutes);
 // Call only once to seed categories with some data
 // seedCategories();
 
-app.listen(7000, () => {
-  console.log("Running on port 7000");
+app.listen(7001, () => {
+  console.log("Running on port 7001");
 });
