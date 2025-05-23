@@ -17,20 +17,6 @@ const getAllCategories = async (req: Request, res: Response) => {
   }
 };
 
-const uploadCoverImage = async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "Image file missing" });
-    }
-    const imageUrl = await uploadImage(req.file);
-
-    res.status(201).json(imageUrl);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Failed to upload image" });
-  }
-};
-
 const createArticle = async (req: Request, res: Response) => {
   try {
     const article = new Article(req.body);
@@ -181,7 +167,7 @@ const getCurrentUserArticles = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
 
-    const pageSize = 5;
+    const pageSize = parseInt(req.query.pageSize as string) || 10;
     const skip = pageSize * page - pageSize;
     const articles = await Article.find({ author: req.userId })
       .populate("author", "name")
@@ -259,31 +245,36 @@ const updateArticle = async (req: Request, res: Response) => {
 };
 
 const deleteArticle = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const article = await Article.findById(id);
+  try {
+    const { id } = req.params;
+    const article = await Article.findById(id);
 
-  if (!article) {
-    return res.status(404).json({ message: "Article not found!" });
-  }
-
-  if (req.userId !== article.author.toString()) {
-    return res.status(403).json({
-      message: "You're only allowed to delete articles created by you.",
-    });
-  }
-
-  const imageToDelete = article.coverImageUrl;
-  const result = await article.deleteOne();
-
-  if (result.deletedCount === 1) {
-    if (imageToDelete) {
-      await deleteImage(imageToDelete);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found!" });
     }
 
-    await Comment.deleteMany({ article: id });
-  }
+    if (req.userId !== article.author.toString()) {
+      return res.status(403).json({
+        message: "You're only allowed to delete articles created by you.",
+      });
+    }
 
-  res.status(200).json({ message: "Article succesfully deleted" });
+    const imageToDelete = article.coverImageUrl;
+    const result = await article.deleteOne();
+
+    if (result.deletedCount === 1) {
+      if (imageToDelete) {
+        await deleteImage(imageToDelete);
+      }
+
+      await Comment.deleteMany({ article: id });
+    }
+
+    res.status(200).json({ message: "Article successfully deleted" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to delete article" });
+  }
 };
 
 const searchArticles = async (req: Request, res: Response) => {
@@ -337,7 +328,7 @@ const searchArticles = async (req: Request, res: Response) => {
 export default {
   createArticle,
   getAllCategories,
-  uploadCoverImage,
+  // uploadCoverImage,
   getArticles,
   getArticlesByCategory,
   getArticlesByUser,
