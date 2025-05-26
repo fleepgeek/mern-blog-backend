@@ -167,15 +167,20 @@ const getCurrentUserArticles = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
 
+    const searchQuery = (req.query.title as string) || "";
+    const query: any = {};
+    query["author"] = req.userId;
+    query["title"] = new RegExp(searchQuery, "i");
+
     const pageSize = parseInt(req.query.pageSize as string) || 10;
     const skip = pageSize * page - pageSize;
-    const articles = await Article.find({ author: req.userId })
+    const articles = await Article.find(query)
       .populate("author", "name")
       .limit(pageSize)
       .skip(skip)
       .lean();
 
-    const total = await Article.countDocuments({ author: req.userId });
+    const total = await Article.countDocuments(query);
 
     const response = {
       pagingInfo: {
