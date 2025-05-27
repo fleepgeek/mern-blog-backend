@@ -46,6 +46,7 @@ const getArticles = async (req: Request, res: Response) => {
     const articles = await Article.find()
       .populate("author", "name")
       .populate("category", "name")
+      .sort({ createdAt: -1 }) // Sort by creation date, most recent first
       .limit(pageSize)
       .skip(skip)
       .lean();
@@ -94,6 +95,7 @@ const getArticlesByCategory = async (req: Request, res: Response) => {
     })
       .populate("author", "name")
       .populate("category", "name")
+      .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(skip)
       .lean();
@@ -142,6 +144,7 @@ const getArticlesByUser = async (req: Request, res: Response) => {
     })
       .populate("author", "name")
       .populate("category", "name")
+      .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(skip)
       .lean();
@@ -172,10 +175,13 @@ const getCurrentUserArticles = async (req: Request, res: Response) => {
     query["author"] = req.userId;
     query["title"] = new RegExp(searchQuery, "i");
 
+    const sortBy = (req.query.sortBy as string) || "-1"; // Default to newest
+
     const pageSize = parseInt(req.query.pageSize as string) || 10;
     const skip = pageSize * page - pageSize;
     const articles = await Article.find(query)
       .populate("author", "name")
+      .sort({ createdAt: sortBy === "newest" ? -1 : 1 }) // Sort by creation date
       .limit(pageSize)
       .skip(skip)
       .lean();
