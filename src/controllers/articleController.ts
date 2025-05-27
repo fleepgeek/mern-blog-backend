@@ -177,6 +177,15 @@ const getCurrentUserArticles = async (req: Request, res: Response) => {
 
     const sortBy = (req.query.sortBy as string) || "-1"; // Default to newest
 
+    const filterByCategoryQuery = req.query.filterByCategory as string;
+    if (filterByCategoryQuery && filterByCategoryQuery !== "all") {
+      const categories = await Category.find({
+        name: new RegExp(filterByCategoryQuery, "i"),
+      }).select("_id");
+      const categoryIds = categories.map((cat) => cat._id);
+      query["category"] = { $in: categoryIds };
+    }
+
     const pageSize = parseInt(req.query.pageSize as string) || 10;
     const skip = pageSize * page - pageSize;
     const articles = await Article.find(query)
