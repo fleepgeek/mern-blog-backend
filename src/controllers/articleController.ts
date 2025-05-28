@@ -47,6 +47,10 @@ const getArticles = async (req: Request, res: Response) => {
       .populate("author", "name")
       .populate("category", "name")
       .sort({ createdAt: -1 }) // Sort by creation date, most recent first
+      .select("title author category createdAt coverImageUrl")
+      .select({
+        content: { $substr: ["$content", 0, 200] }, // First 200 characters
+      })
       .limit(pageSize)
       .skip(skip)
       .lean();
@@ -191,6 +195,7 @@ const getCurrentUserArticles = async (req: Request, res: Response) => {
     const articles = await Article.find(query)
       .populate("author", "name")
       .sort({ createdAt: sortBy === "newest" ? -1 : 1 }) // Sort by creation date
+      .select("title")
       .limit(pageSize)
       .skip(skip)
       .lean();
