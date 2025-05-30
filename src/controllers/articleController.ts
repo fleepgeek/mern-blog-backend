@@ -3,6 +3,35 @@ import Article, { Category } from "../models/article";
 import mongoose from "mongoose";
 import { deleteImage, uploadImage } from "../utils/handleImage";
 import Comment from "../models/comment";
+import sanitizeHtml from "sanitize-html";
+
+// Sanitization options
+const sanitizeOptions = {
+  allowedTags: [
+    "h1",
+    "h2",
+    "h3",
+    "p",
+    "br",
+    "strong",
+    "em",
+    "ul",
+    "ol",
+    "li",
+    "code",
+    "pre",
+    "a",
+    "img",
+  ],
+  allowedAttributes: {
+    a: ["href"],
+    img: ["src", "alt"],
+    "*": ["class"],
+  },
+  allowedClasses: {
+    "*": ["*"], // Allow all classes, adjust as needed
+  },
+};
 
 const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -19,7 +48,12 @@ const getAllCategories = async (req: Request, res: Response) => {
 
 const createArticle = async (req: Request, res: Response) => {
   try {
-    const article = new Article(req.body);
+    // Sanitize the content before saving
+    const sanitizedContent = sanitizeHtml(req.body.content, sanitizeOptions);
+    const article = new Article({
+      ...req.body,
+      content: sanitizedContent,
+    });
     article.author = new mongoose.Types.ObjectId(req.userId);
 
     if (req.file) {
@@ -250,7 +284,7 @@ const updateArticle = async (req: Request, res: Response) => {
 
     article.title = title;
     article.category = category;
-    article.content = content;
+    article.content = sanitizeHtml(content, sanitizeOptions);
 
     if (req.file) {
       const imageUrl = await uploadImage(req.file);
