@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { jwtCheck, jwtValidate } from "../middlewares/auth";
-import ArticleController from "../controllers/ArticleController";
+import articleController from "../controllers/articleController";
 import { upload } from "../middlewares/upload";
 import {
   validateArticleRequest,
@@ -15,26 +15,26 @@ router.post(
   jwtCheck,
   jwtValidate,
   validateArticleRequest,
-  ArticleController.createArticle
+  articleController.createArticle
 );
 
 router.get(
   "/me",
   jwtCheck,
   jwtValidate,
-  ArticleController.getCurrentUserArticles
+  articleController.getCurrentUserArticles
 );
 
-router.get("/categories", ArticleController.getAllCategories);
-router.get("/", ArticleController.getArticles);
+router.get("/categories", articleController.getAllCategories);
+router.get("/", articleController.getArticles);
 router.get(
   "/search",
   validateArticleSearchRequest,
-  ArticleController.searchArticles
+  articleController.searchArticles
 );
-router.get("/category/:id", ArticleController.getArticlesByCategory);
-router.get("/user/:id", ArticleController.getArticlesByUser);
-router.get("/:id", ArticleController.getSingleArticle);
+router.get("/category/:id", articleController.getArticlesByCategory);
+router.get("/user/:id", articleController.getArticlesByUser);
+router.get("/:id", articleController.getSingleArticle);
 
 router.put(
   "/:id",
@@ -42,10 +42,10 @@ router.put(
   jwtCheck,
   jwtValidate,
   validateArticleRequest,
-  ArticleController.updateArticle
+  articleController.updateArticle
 );
 
-router.delete("/:id", jwtCheck, jwtValidate, ArticleController.deleteArticle);
+router.delete("/:id", jwtCheck, jwtValidate, articleController.deleteArticle);
 
 // Re-route into comment router
 import commentRoutes from "./commentRoute";

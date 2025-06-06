@@ -1,19 +1,19 @@
 import { Router } from "express";
-import CommentController from "../controllers/CommentController";
+import commentController from "../controllers/commentController";
 import { jwtCheck, jwtValidate } from "../middlewares/auth";
 import { validateCommentRequest } from "../middlewares/validation";
 
 // const router = Router();
 const router = Router({ mergeParams: true });
 
-router.get("/", CommentController.getArticleComments);
+router.get("/", commentController.getArticleComments);
 
 router.post(
   "/",
   jwtCheck,
   jwtValidate,
   validateCommentRequest,
-  CommentController.postComment
+  commentController.postComment
 );
 
 router.patch(
@@ -21,14 +21,14 @@ router.patch(
   jwtCheck,
   jwtValidate,
   validateCommentRequest,
-  CommentController.updateUserComment
+  commentController.updateUserComment
 );
 
 router.delete(
   "/:commentId",
   jwtCheck,
   jwtValidate,
-  CommentController.deleteUserComment
+  commentController.deleteUserComment
 );
 
 export default router;

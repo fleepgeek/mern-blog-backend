@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { User } from "../models/user";
+import User from "../models/user";
 import Article from "../models/article";
 import { ObjectId } from "mongodb";
 

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { auth } from "express-oauth2-jwt-bearer";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user";
+import User from "../models/user";
 
 const jwtCheck = auth({
   audience: process.env.AUTH0_AUDIENCE,
